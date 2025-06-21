@@ -4,7 +4,7 @@ import { NorsemenService } from "./norsemen.service";
 import { CreateNorsemanDto } from "./dto/create-norseman-dto";
 import { UpdateNorsemanDto } from "./dto/update-norseman-dto";
 
-import { INorseman } from "interfaces";
+import { INorseman } from "./interfaces/norsemen.interface";
 
 
 @Controller("norsemen")

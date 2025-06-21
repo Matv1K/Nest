@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateNorsemanDto } from "./dto/create-norseman-dto";
 import { UpdateNorsemanDto } from "./dto/update-norseman-dto";
-import { INorseman } from "interfaces";
+import { INorseman } from "./interfaces/norsemen.interface";
 
 @Injectable()
 export class NorsemenService {
