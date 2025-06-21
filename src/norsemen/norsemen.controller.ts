@@ -25,13 +25,11 @@ export class NorsemenController {
     }
 
     @Put()
-    @HttpCode(204)
     updateOneNorseman(@Body() updateNorsemanDto: UpdateNorsemanDto) {
         return this.norsemenService.updateOneNorseman(updateNorsemanDto)
     }
 
     @Delete(':id')
-    @HttpCode(204)
     deleteOneNorseman(@Param() { id }: { id: string }) {
         return this.norsemenService.deleteOneNorseman(id)
     }
