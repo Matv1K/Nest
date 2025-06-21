@@ -1,7 +1,10 @@
 import { Controller, Get, Post, Body, HttpCode, Param, Put, Delete } from "@nestjs/common";
 import { NorsemenService } from "./norsemen.service";
+
 import { CreateNorsemanDto } from "./dto/create-norseman-dto";
 import { UpdateNorsemanDto } from "./dto/update-norseman-dto";
+
+import { INorseman } from "interfaces";
 
 
 @Controller("norsemen")
@@ -9,7 +12,7 @@ export class NorsemenController {
     constructor(private readonly norsemenService: NorsemenService) {}
 
     @Get()
-    getAllNorsemen(): string {
+    getAllNorsemen(): INorseman[] {
         return this.norsemenService.getAllNorsemen()
     }
 
@@ -20,13 +23,13 @@ export class NorsemenController {
 
     @Post()
     @HttpCode(201)
-    addOneNorseman(@Body() createNorsemanDto: CreateNorsemanDto): string {        
+    addOneNorseman(@Body() createNorsemanDto: CreateNorsemanDto): INorseman {        
         return this.norsemenService.addOneNorseman(createNorsemanDto);
     }
 
-    @Put()
-    updateOneNorseman(@Body() updateNorsemanDto: UpdateNorsemanDto) {
-        return this.norsemenService.updateOneNorseman(updateNorsemanDto)
+    @Put(':id')
+    updateOneNorseman(@Param() { id }: { id: string } ,@Body() updateNorsemanDto: UpdateNorsemanDto) {
+        return this.norsemenService.updateOneNorseman(id, updateNorsemanDto)
     }
 
     @Delete(':id')
