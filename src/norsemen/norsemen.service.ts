@@ -1,18 +1,19 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateNorsemanDto } from "./dto/create-norseman-dto";
-import { UpdateNorsemanDto } from "./dto/update-norseman-dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Norseman } from "./norseman.entity";
 import { INorseman } from "./interfaces/norsemen.interface";
 
 @Injectable()
 export class NorsemenService {
-    private norsemen: INorseman[] = [];
+    constructor(@InjectRepository(Norseman) private readonly repo: Repository<Norseman>) {}
 
-    getAllNorsemen(): INorseman[] {
-        return this.norsemen;
+    getAllNorsemen(): Promise<INorseman[]> {
+        return this.repo.find();
     }
 
-    getOneNorseman(id: string): INorseman {
-        const norseman = this.norsemen.find((n) => n.id === Number(id));
+    async getOneNorseman(id: string): Promise<Norseman> {
+        const norseman = await this.repo.findOne({ where: { id: Number(id) }})
 
         if (!norseman) {
             throw new NotFoundException(`Norseman with id ${id} not found`);
@@ -21,33 +22,26 @@ export class NorsemenService {
         return norseman;
     }
 
-    addOneNorseman(createNorsemanDto: CreateNorsemanDto): INorseman {
-        const newNorseman: INorseman = { id: Number(Date.now()), ...createNorsemanDto,};
-        this.norsemen.push(newNorseman);
-        return newNorseman;
+    addOneNorseman(data: { name: string; description: string }) {
+        const newNorseman = this.repo.create(data);
+        return this.repo.save(newNorseman);
     }
 
-    updateOneNorseman(id: string, updateNorsemanDto: UpdateNorsemanDto): INorseman {
-        const index = this.norsemen.findIndex((n) => n.id === Number(id));
+    async updateOneNorseman(id: string, data: { name: string; description: string }): Promise<Norseman> {
+        const norseman = await this.repo.findOne({ where: { id: Number(id) }});
 
-        if (index === -1) {
+        if (!norseman) {
             throw new NotFoundException(`Norseman with id ${id} not found`);
         }
 
-        const updatedNorseman = {...this.norsemen[index], ...updateNorsemanDto};
+        norseman.name = data.name;
+        norseman.description = data.description;
 
-        this.norsemen[index] = updatedNorseman;
-        return updatedNorseman;
+        return await this.repo.save(norseman);
     }
 
-    deleteOneNorseman(id: string): string {
-        const index = this.norsemen.findIndex((n) => n.id === Number(id));
-
-        if (index === -1) {
-            throw new NotFoundException(`Norseman with id ${id} not found`);
-        }
-
-        this.norsemen.splice(index, 1);
-        return `Norseman number ${id} has gone to Valhalla`;
+    async deleteOneNorseman(id: string): Promise<string> {
+        await this.repo.delete(id);
+        return `Norseman with id ${id} has gone to Valhalla`;
     }
 }
